@@ -18,7 +18,7 @@ pydantic-settings = "2.8.1"
 httpx = "0.28.1"
 groq = "0.24.0"
 structlog = "25.1.0"
-sentry-sdk = { version = "2.24.1", extras = ["fastapi"] }
+sentry-sdk = { version = "2.56.0", extras = ["fastapi"] }
 tenacity = "9.1.2"
 sse-starlette = "^2.1.0"
 
