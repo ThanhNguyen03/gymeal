@@ -1,0 +1,11 @@
+{
+  "name": "back-end",
+  "private": true,
+  "scripts": {
+    "dev": "dotnet watch run --project src/Gymeal.Presentation",
+    "build": "dotnet build",
+    "test": "dotnet test",
+    "lint": "dotnet format --verify-no-changes",
+    "format": "dotnet format"
+  }
+}

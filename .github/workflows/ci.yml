@@ -1,0 +1,175 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "sprint/**", "feat/**", "fix/**"]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Front-End ───────────────────────────────────────────────────────────────
+  lint-frontend:
+    name: Lint — Next.js
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Corepack must be enabled BEFORE setup-node so that the yarn cache
+      # detection in setup-node works with Yarn 4 (not the system Yarn 1.x)
+      - name: Enable Corepack (Yarn 4)
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint
+        run: yarn workspace front-end lint
+
+      - name: Type check
+        run: yarn workspace front-end exec tsc --noEmit
+
+  build-frontend:
+    name: Build — Next.js
+    runs-on: ubuntu-latest
+    needs: lint-frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable Corepack (Yarn 4)
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn workspace front-end build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:5000
+          NEXT_PUBLIC_SENTRY_DSN: ""
+
+  # ── Back-End (C#) ───────────────────────────────────────────────────────────
+  lint-backend:
+    name: Lint — C# (.NET)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore
+        working-directory: apps/back-end
+
+      - name: Check formatting
+        run: dotnet format --verify-no-changes
+        working-directory: apps/back-end
+
+  build-backend:
+    name: Build — C# (.NET)
+    runs-on: ubuntu-latest
+    needs: lint-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore
+        working-directory: apps/back-end
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+        working-directory: apps/back-end
+
+  # ── AI Service (Python) ─────────────────────────────────────────────────────
+  lint-ai-service:
+    name: Lint — Python (FastAPI)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: "1.8.5"
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: apps/ai-service/.venv
+          key: venv-${{ runner.os }}-${{ hashFiles('apps/ai-service/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction
+        working-directory: apps/ai-service
+
+      - name: Ruff lint
+        run: poetry run ruff check .
+        working-directory: apps/ai-service
+
+      - name: Mypy type check
+        run: poetry run mypy .
+        working-directory: apps/ai-service
+
+  # ── Security Audit ──────────────────────────────────────────────────────────
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable Corepack (Yarn 4)
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: npm audit (front-end)
+        run: yarn workspace front-end exec npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Setup .NET (for NuGet audit)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: NuGet vulnerability check
+        run: dotnet list package --vulnerable --include-transitive
+        working-directory: apps/back-end
+        continue-on-error: true

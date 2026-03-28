@@ -1,0 +1,70 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Next.js
+apps/front-end/.next/
+apps/front-end/out/
+
+# Build artifacts
+dist/
+build/
+
+# C# / .NET
+apps/back-end/**/bin/
+apps/back-end/**/obj/
+apps/back-end/**/*.user
+apps/back-end/**/.vs/
+apps/back-end/**/*.suo
+
+# Python
+apps/ai-service/.venv/
+apps/ai-service/__pycache__/
+apps/ai-service/**/__pycache__/
+apps/ai-service/**/*.pyc
+apps/ai-service/**/*.pyo
+apps/ai-service/.mypy_cache/
+apps/ai-service/.ruff_cache/
+apps/ai-service/.pytest_cache/
+apps/ai-service/htmlcov/
+apps/ai-service/.coverage
+
+# Logs
+*.log
+logs/
+
+# Internal docs (not for public GitHub)
+PLAN.md
+RULE.md
+CHANGE_LOG.md
+memory
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+
+# Turbo
+.turbo/
+
+# Yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# IDE
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+
