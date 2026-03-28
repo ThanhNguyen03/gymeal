@@ -1,0 +1,46 @@
+version: "3.9"
+
+# Local development infrastructure only.
+# Back-end, ai-service, and front-end run via yarn dev (Turbo), NOT in Docker.
+# Docker provides: PostgreSQL (+ pgvector) + Redis.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: gymeal_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gymeal
+      POSTGRES_PASSWORD: gymeal_dev_password
+      POSTGRES_DB: gymeal_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gymeal -d gymeal_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: gymeal_redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:
+    driver: local
+  redisdata:
+    driver: local

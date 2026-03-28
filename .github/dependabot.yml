@@ -1,0 +1,46 @@
+version: 2
+updates:
+  # Front-end (Next.js)
+  - package-ecosystem: "npm"
+    directory: "/apps/front-end"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "front-end"]
+
+  # Root workspace (Turbo + shared dev deps)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels: ["dependencies", "tooling"]
+
+  # Python ai-service (Poetry)
+  - package-ecosystem: "pip"
+    directory: "/apps/ai-service"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "ai-service"]
+
+  # C# back-end (NuGet)
+  - package-ecosystem: "nuget"
+    directory: "/apps/back-end"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "back-end"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels: ["dependencies", "ci"]

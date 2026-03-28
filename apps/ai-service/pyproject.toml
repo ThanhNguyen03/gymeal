@@ -1,0 +1,61 @@
+[tool.poetry]
+name = "gymeal-ai-service"
+version = "0.1.0"
+description = "GymEats AI nutrition coaching service (FastAPI + Groq + pgvector)"
+authors = ["GymEats Team"]
+readme = "README.md"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "0.115.12"
+uvicorn = { version = "0.34.0", extras = ["standard"] }
+sqlalchemy = { version = "2.0.40", extras = ["asyncio"] }
+asyncpg = "0.30.0"
+pgvector = "0.4.0"
+pydantic = "2.11.1"
+pydantic-settings = "2.8.1"
+httpx = "0.28.1"
+groq = "0.24.0"
+structlog = "25.1.0"
+sentry-sdk = { version = "2.24.1", extras = ["fastapi"] }
+tenacity = "9.1.2"
+sse-starlette = "2.3.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "0.11.2"
+mypy = "1.15.0"
+pytest = "8.3.5"
+pytest-asyncio = "0.25.3"
+pytest-cov = "6.1.0"
+httpx = "0.28.1"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+select = ["E", "F", "I", "N", "W", "UP", "ANN", "S", "B"]
+ignore = [
+  "ANN101",  # Missing type annotation for `self`
+  "ANN102",  # Missing type annotation for `cls`
+  "S101",    # Allow assert in tests
+]
+exclude = ["tests/", "scripts/"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+exclude = ["tests/", "scripts/"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "--cov=app --cov-report=term-missing --cov-fail-under=0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+/* ── Skeleton shimmer loading ──────────────────────────────────────────────── */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    theme("colors.neutral.100") 25%,
+    theme("colors.neutral.200") 50%,
+    theme("colors.neutral.100") 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Focus ring ───────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid theme("colors.primary.500");
+  outline-offset: 2px;
+}
+
+/* ── Smooth scrolling ─────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

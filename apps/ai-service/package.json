@@ -1,0 +1,10 @@
+{
+  "name": "ai-service",
+  "private": true,
+  "scripts": {
+    "dev": "poetry run uvicorn app.main:app --reload --port 8001",
+    "lint": "poetry run ruff check . && poetry run mypy .",
+    "format": "poetry run ruff format .",
+    "test": "poetry run pytest"
+  }
+}

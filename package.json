@@ -1,0 +1,19 @@
+{
+  "name": "gymeal",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "yarn@4.12.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "format": "turbo run format"
+  },
+  "devDependencies": {
+    "turbo": "2.3.3"
+  }
+}

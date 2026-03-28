@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>Gymeal.Infrastructure</RootNamespace>
+    <AssemblyName>Gymeal.Infrastructure</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gymeal.Domain\Gymeal.Domain.csproj" />
+    <ProjectReference Include="..\Gymeal.Application\Gymeal.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="StackExchange.Redis" Version="2.8.24" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="14.3.0" />
+    <PackageReference Include="HotChocolate.Data" Version="14.3.0" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="14.3.0" />
+    <PackageReference Include="Sentry.AspNetCore" Version="5.7.0" />
+  </ItemGroup>
+
+</Project>
