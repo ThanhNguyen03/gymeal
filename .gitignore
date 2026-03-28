@@ -39,6 +39,12 @@ apps/ai-service/.coverage
 *.log
 logs/
 
+# Internal docs (not for public GitHub)
+PLAN.md
+RULE.md
+CHANGE_LOG.md
+memory
+
 # OS
 .DS_Store
 Thumbs.db
