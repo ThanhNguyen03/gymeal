@@ -1,10 +1,10 @@
+using System.Text.Json;
 using Gymeal.Application;
 using Gymeal.Infrastructure;
 using Gymeal.Presentation.Middlewares;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using System.Text.Json;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // ── Sentry ────────────────────────────────────────────────────────────────────
 builder.WebHost.UseSentry(options =>
@@ -102,7 +102,7 @@ builder.Services
     .AddQueryType(d => d.Name("Query").Field("_placeholder").Type<StringType>().Resolve("ok"))
     .AddMutationType(d => d.Name("Mutation").Field("_placeholder").Type<StringType>().Resolve("ok"));
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // ── Middleware pipeline ────────────────────────────────────────────────────────
 // NOTE: order matters — CorrelationId must be first to propagate to all logs/errors

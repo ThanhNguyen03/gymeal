@@ -18,14 +18,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Corepack must be enabled BEFORE setup-node so that the yarn cache
+      # detection in setup-node works with Yarn 4 (not the system Yarn 1.x)
+      - name: Enable Corepack (Yarn 4)
+        run: corepack enable
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
           cache: "yarn"
-
-      - name: Enable Corepack (Yarn 4)
-        run: corepack enable
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -43,14 +45,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Enable Corepack (Yarn 4)
+        run: corepack enable
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
           cache: "yarn"
-
-      - name: Enable Corepack (Yarn 4)
-        run: corepack enable
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -146,14 +148,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Enable Corepack (Yarn 4)
+        run: corepack enable
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
           cache: "yarn"
-
-      - name: Enable Corepack (Yarn 4)
-        run: corepack enable
 
       - name: Install dependencies
         run: yarn install --immutable
