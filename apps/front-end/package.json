@@ -10,7 +10,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,json,css,md}\""
   },
   "dependencies": {
-    "@apollo/client": "3.12.10",
+    "@apollo/client": "4.1.6",
     "@sentry/nextjs": "8.55.0",
     "graphql": "16.10.0",
     "next": "15.2.4",
