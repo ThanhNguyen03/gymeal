@@ -1,8 +1,9 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
-interface ErrorProps {
+interface IErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
 }
@@ -11,9 +12,9 @@ interface ErrorProps {
  * Root error boundary — catches unhandled errors in the React tree.
  * Reports to Sentry in production (Sentry.captureException added in Sprint 0 wiring).
  */
-export default function GlobalError({ error, reset }: ErrorProps) {
+export default function GlobalError({ error, reset }: IErrorProps) {
   useEffect(() => {
-    // TODO: wire Sentry.captureException(error) when @sentry/nextjs is configured
+    Sentry.captureException(error);
     console.error("[GlobalError]", error);
   }, [error]);
 
