@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Gymeal.Application.Features.Auth.Commands.LoginUser;
 
-public class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
+public sealed class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
 {
     public LoginUserCommandValidator()
     {

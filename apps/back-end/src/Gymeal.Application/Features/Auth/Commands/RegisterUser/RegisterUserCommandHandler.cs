@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Gymeal.Application.Features.Auth.Commands.RegisterUser;
 
-public class RegisterUserCommandHandler(
+public sealed class RegisterUserCommandHandler(
     IUserRepository userRepository,
     IPasswordHasher passwordHasher,
     ITokenService tokenService,

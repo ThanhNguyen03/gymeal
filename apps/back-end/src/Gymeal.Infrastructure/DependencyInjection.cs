@@ -30,7 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
         // ── AI Service HttpClient (BFF typed client) ──────────────────────────
-        services.AddHttpClient<AiServiceHttpClient>();
+        services.AddHttpClient<ServiceAiHttpClient>();
 
         // ── Redis ─────────────────────────────────────────────────────────────
         string redisUrl = configuration["REDIS_URL"]
@@ -43,12 +43,12 @@ public static class DependencyInjection
         });
 
         // ── Repositories ──────────────────────────────────────────────────────
-        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserRepository, RepositoryUser>();
 
         // ── Domain services ───────────────────────────────────────────────────
-        services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
-        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        services.AddScoped<ITokenService, RedisTokenService>();
+        services.AddSingleton<IPasswordHasher, ServiceBcryptPasswordHasher>();
+        services.AddSingleton<IDateTimeProvider, ServiceDateTimeProvider>();
+        services.AddScoped<ITokenService, ServiceRedisToken>();
 
         return services;
     }

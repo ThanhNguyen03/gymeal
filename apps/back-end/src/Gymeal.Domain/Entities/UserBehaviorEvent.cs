@@ -6,7 +6,7 @@ namespace Gymeal.Domain.Entities;
 /// Tracks user interactions with meals (views, orders, searches, dismissals).
 /// Feeds the preference learner to compute UserPreferenceEmbedding (Sprint 5).
 /// </summary>
-public class UserBehaviorEvent : BaseEntity
+public sealed class UserBehaviorEvent : BaseEntity
 {
     public Guid UserId { get; set; }
     public Guid? MealId { get; set; }

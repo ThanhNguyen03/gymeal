@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Gymeal.Application.Features.Auth.Commands.LogoutUser;
 
-public class LogoutUserCommandValidator : AbstractValidator<LogoutUserCommand>
+public sealed class LogoutUserCommandValidator : AbstractValidator<LogoutUserCommand>
 {
     public LogoutUserCommandValidator()
     {

@@ -5,7 +5,7 @@ namespace Gymeal.Domain.Entities;
 /// One row per user (UserId is PK). Recomputed by QStash daily cron.
 /// Used for personalized meal recommendations (Sprint 5).
 /// </summary>
-public class UserPreferenceEmbedding
+public sealed class UserPreferenceEmbedding
 {
     public Guid UserId { get; set; }
 

@@ -6,7 +6,7 @@ namespace Gymeal.Domain.Entities;
 /// Fitness profile for a user. UserId is both the PK and FK to users.
 /// Created with minimal data at registration; completed via the profile wizard.
 /// </summary>
-public class UserProfile
+public sealed class UserProfile
 {
     public Guid UserId { get; set; }
     public string? FullName { get; set; }

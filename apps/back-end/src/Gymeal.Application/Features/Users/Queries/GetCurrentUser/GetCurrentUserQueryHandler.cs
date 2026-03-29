@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Gymeal.Application.Features.Users.Queries.GetCurrentUser;
 
-public class GetCurrentUserQueryHandler(
+public sealed class GetCurrentUserQueryHandler(
     IUserRepository userRepository,
     ICurrentUserService currentUser) : IRequestHandler<GetCurrentUserQuery, Result<UserProfileDto>>
 {

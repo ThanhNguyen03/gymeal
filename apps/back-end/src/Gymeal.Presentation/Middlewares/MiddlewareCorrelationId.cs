@@ -10,7 +10,7 @@ namespace Gymeal.Presentation.Middlewares;
 /// NOTE: CancellationToken allows the request to be cancelled if the user navigates away
 /// or the HTTP connection drops. Without it, abandoned requests waste server resources.
 /// </remarks>
-sealed class CorrelationIdMiddleware(RequestDelegate next)
+sealed class MiddlewareCorrelationId(RequestDelegate next)
 {
     private const string CORRELATION_ID_HEADER = "X-Correlation-Id";
 

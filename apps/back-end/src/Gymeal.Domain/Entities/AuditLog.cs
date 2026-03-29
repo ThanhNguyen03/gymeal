@@ -11,7 +11,7 @@ namespace Gymeal.Domain.Entities;
 /// Reason: The entire point of an audit trail is permanent, tamper-evident history.
 /// Reference: PLAN.md §4.6
 /// </remarks>
-public class AuditLog : BaseEntity
+public sealed class AuditLog : BaseEntity
 {
     public Guid? UserId { get; set; }
     public string EntityType { get; set; } = string.Empty;

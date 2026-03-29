@@ -19,7 +19,7 @@ namespace Gymeal.Infrastructure.Services;
 /// deleted immediately (revocation without DB lookup).
 /// Reference: PLAN.md §7 (Application Security)
 /// </remarks>
-public class RedisTokenService(IConfiguration configuration, IDistributedCache cache) : ITokenService
+public sealed class ServiceRedisToken(IConfiguration configuration, IDistributedCache cache) : ITokenService
 {
     private const int ACCESS_TOKEN_EXPIRY_MINUTES = 15;
     private const int REFRESH_TOKEN_EXPIRY_DAYS = 7;

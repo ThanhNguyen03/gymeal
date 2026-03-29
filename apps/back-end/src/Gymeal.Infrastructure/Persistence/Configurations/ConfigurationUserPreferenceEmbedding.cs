@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Gymeal.Infrastructure.Persistence.Configurations;
 
-public class UserPreferenceEmbeddingConfiguration : IEntityTypeConfiguration<UserPreferenceEmbedding>
+public sealed class ConfigurationUserPreferenceEmbedding : IEntityTypeConfiguration<UserPreferenceEmbedding>
 {
     public void Configure(EntityTypeBuilder<UserPreferenceEmbedding> builder)
     {

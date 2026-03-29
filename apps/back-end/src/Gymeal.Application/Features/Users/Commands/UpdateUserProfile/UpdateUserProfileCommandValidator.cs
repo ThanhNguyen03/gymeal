@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Gymeal.Application.Features.Users.Commands.UpdateUserProfile;
 
-public class UpdateUserProfileCommandValidator : AbstractValidator<UpdateUserProfileCommand>
+public sealed class UpdateUserProfileCommandValidator : AbstractValidator<UpdateUserProfileCommand>
 {
     public UpdateUserProfileCommandValidator()
     {

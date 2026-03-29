@@ -7,7 +7,7 @@ namespace Gymeal.Presentation.Middlewares;
 /// Global exception handler. Catches all unhandled exceptions and returns
 /// RFC 7807 Problem Details JSON. Reports to Sentry in production.
 /// </summary>
-sealed class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IWebHostEnvironment env)
+sealed class MiddlewareException(RequestDelegate next, ILogger<MiddlewareException> logger, IWebHostEnvironment env)
 {
     public async Task InvokeAsync(HttpContext context)
     {

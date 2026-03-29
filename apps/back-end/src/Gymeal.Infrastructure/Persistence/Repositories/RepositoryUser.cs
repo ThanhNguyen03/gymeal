@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Gymeal.Infrastructure.Persistence.Repositories;
 
-public class UserRepository(AppDbContext context) : IUserRepository
+public sealed class RepositoryUser(AppDbContext context) : IUserRepository
 {
     public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         await context.Users
