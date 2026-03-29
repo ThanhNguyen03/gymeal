@@ -22,6 +22,8 @@
     <PackageReference Include="FluentAssertions" Version="7.0.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.1.0" />
     <PackageReference Include="Testcontainers.Redis" Version="4.1.0" />
+    <!-- Security: pin transitive dep to fix GHSA-73j8-2gch-69rq (HIGH) in Microsoft.Bcl.Memory 9.0.0 -->
+    <PackageReference Include="Microsoft.Bcl.Memory" Version="9.0.1" />
   </ItemGroup>
 
 </Project>

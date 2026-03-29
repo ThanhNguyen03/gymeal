@@ -28,6 +28,8 @@
     <PackageReference Include="HotChocolate.Data" Version="14.3.0" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="14.3.0" />
     <PackageReference Include="Sentry.AspNetCore" Version="5.7.0" />
+    <!-- Security: pin transitive dep to fix GHSA-73j8-2gch-69rq (HIGH) in Microsoft.Bcl.Memory 9.0.0 -->
+    <PackageReference Include="Microsoft.Bcl.Memory" Version="9.0.1" />
   </ItemGroup>
 
 </Project>
