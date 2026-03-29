@@ -2,7 +2,7 @@ using Gymeal.Domain.Interfaces.Services;
 
 namespace Gymeal.Infrastructure.Services;
 
-public class DateTimeProvider : IDateTimeProvider
+public sealed class ServiceDateTimeProvider : IDateTimeProvider
 {
     public DateTime UtcNow => DateTime.UtcNow;
 }

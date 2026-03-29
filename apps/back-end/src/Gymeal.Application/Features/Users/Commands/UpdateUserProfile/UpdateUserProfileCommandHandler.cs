@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Gymeal.Application.Features.Users.Commands.UpdateUserProfile;
 
-public class UpdateUserProfileCommandHandler(
+public sealed class UpdateUserProfileCommandHandler(
     IUserRepository userRepository,
     ICurrentUserService currentUser,
     IDateTimeProvider dateTime) : IRequestHandler<UpdateUserProfileCommand, Result<UserProfileDto>>

@@ -12,7 +12,7 @@ namespace Gymeal.Domain.Entities;
 /// Python ai-service uses SQLAlchemy ORM for read/write — no Alembic.
 /// Reference: PLAN.md §10 (Migration Ownership Rule)
 /// </remarks>
-public class NutritionDocument : BaseEntity
+public sealed class NutritionDocument : BaseEntity
 {
     public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Gymeal.Application.Features.Auth.Commands.LogoutUser;
 
-public class LogoutUserCommandHandler(ITokenService tokenService)
+public sealed class LogoutUserCommandHandler(ITokenService tokenService)
     : IRequestHandler<LogoutUserCommand, Result<bool>>
 {
     public async Task<Result<bool>> Handle(

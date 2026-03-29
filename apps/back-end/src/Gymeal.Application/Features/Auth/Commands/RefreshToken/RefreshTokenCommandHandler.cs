@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Gymeal.Application.Features.Auth.Commands.RefreshToken;
 
-public class RefreshTokenCommandHandler(
+public sealed class RefreshTokenCommandHandler(
     IUserRepository userRepository,
     ITokenService tokenService,
     IDateTimeProvider dateTime) : IRequestHandler<RefreshTokenCommand, Result<AuthResponseDto>>

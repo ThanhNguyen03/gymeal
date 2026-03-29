@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Gymeal.Application.Features.Auth.Commands.LoginUser;
 
-public class LoginUserCommandHandler(
+public sealed class LoginUserCommandHandler(
     IUserRepository userRepository,
     IPasswordHasher passwordHasher,
     ITokenService tokenService,

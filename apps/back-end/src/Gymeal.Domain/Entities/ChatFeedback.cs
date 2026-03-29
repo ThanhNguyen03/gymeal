@@ -6,7 +6,7 @@ namespace Gymeal.Domain.Entities;
 /// Thumbs-up/down feedback on AI chat responses.
 /// Feeds the preference learner and measures chat quality (Sprint 5).
 /// </summary>
-public class ChatFeedback : BaseEntity
+public sealed class ChatFeedback : BaseEntity
 {
     public Guid MessageId { get; set; }
     public Guid UserId { get; set; }

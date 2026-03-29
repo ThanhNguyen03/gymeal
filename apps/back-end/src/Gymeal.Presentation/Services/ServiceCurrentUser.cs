@@ -8,7 +8,7 @@ namespace Gymeal.Presentation.Services;
 /// Resolves the authenticated user's ID and IP address from the current HTTP context.
 /// Registered as Scoped — one instance per HTTP request.
 /// </summary>
-public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
+public sealed class ServiceCurrentUser(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
 {
     public Guid? UserId
     {

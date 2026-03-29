@@ -23,7 +23,7 @@ public interface IAuditableCommand { }
 /// This design keeps the Application layer clean — no direct ChangeTracker access here.
 /// Reference: PLAN.md §4.6
 /// </remarks>
-public class AuditBehaviour<TRequest, TResponse>(Microsoft.Extensions.Logging.ILogger<AuditBehaviour<TRequest, TResponse>> logger)
+public sealed class AuditBehaviour<TRequest, TResponse>(Microsoft.Extensions.Logging.ILogger<AuditBehaviour<TRequest, TResponse>> logger)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IAuditableCommand
 {

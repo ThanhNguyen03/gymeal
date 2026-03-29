@@ -12,7 +12,7 @@ namespace Gymeal.Infrastructure.Services;
 /// Work factor 10 (default) is too fast on modern GPUs.
 /// Work factor 14+ is noticeably slow for login UX.
 /// </remarks>
-public class BcryptPasswordHasher : IPasswordHasher
+public sealed class ServiceBcryptPasswordHasher : IPasswordHasher
 {
     private const int WORK_FACTOR = 12;
 

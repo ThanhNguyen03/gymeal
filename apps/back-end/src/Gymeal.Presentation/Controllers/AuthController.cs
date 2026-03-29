@@ -12,7 +12,7 @@ namespace Gymeal.Presentation.Controllers;
 
 [ApiController]
 [Route("api/v1/auth")]
-public class AuthController(ISender mediator) : ControllerBase
+public sealed class AuthController(ISender mediator) : ControllerBase
 {
     /// <summary>Register a new customer account.</summary>
     /// <response code="201">Registration successful — auth cookies set.</response>

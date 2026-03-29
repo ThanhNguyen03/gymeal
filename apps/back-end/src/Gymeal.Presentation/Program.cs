@@ -59,11 +59,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// ── HttpContextAccessor (needed by CurrentUserService) ────────────────────────
+// ── HttpContextAccessor (needed by ServiceCurrentUser) ────────────────────────
 builder.Services.AddHttpContextAccessor();
 
-// ── CurrentUserService (Scoped — one per request) ─────────────────────────────
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+// ── ServiceCurrentUser (Scoped — one per request) ─────────────────────────────
+builder.Services.AddScoped<ICurrentUserService, ServiceCurrentUser>();
 
 // ── JWT RS256 Authentication ──────────────────────────────────────────────────
 // SECURITY: RS256 asymmetric — private key on back-end, public key shared with edge.
@@ -188,8 +188,8 @@ WebApplication app = builder.Build();
 
 // ── Middleware pipeline ────────────────────────────────────────────────────────
 // NOTE: Order matters — CorrelationId must be first to propagate to all logs/errors.
-app.UseMiddleware<CorrelationIdMiddleware>();
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<MiddlewareCorrelationId>();
+app.UseMiddleware<MiddlewareException>();
 
 if (app.Environment.IsDevelopment())
 {

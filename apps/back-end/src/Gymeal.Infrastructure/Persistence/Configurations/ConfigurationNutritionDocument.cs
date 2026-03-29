@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Gymeal.Infrastructure.Persistence.Configurations;
 
-public class NutritionDocumentConfiguration : IEntityTypeConfiguration<NutritionDocument>
+public sealed class ConfigurationNutritionDocument : IEntityTypeConfiguration<NutritionDocument>
 {
     public void Configure(EntityTypeBuilder<NutritionDocument> builder)
     {

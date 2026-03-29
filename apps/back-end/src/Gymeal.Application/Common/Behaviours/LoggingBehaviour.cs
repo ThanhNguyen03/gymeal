@@ -7,7 +7,7 @@ namespace Gymeal.Application.Common.Behaviours;
 /// MediatR pipeline behaviour that logs request entry/exit and execution time.
 /// Runs first in the pipeline — before validation and audit.
 /// </summary>
-public class LoggingBehaviour<TRequest, TResponse>(ILogger<LoggingBehaviour<TRequest, TResponse>> logger)
+public sealed class LoggingBehaviour<TRequest, TResponse>(ILogger<LoggingBehaviour<TRequest, TResponse>> logger)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Gymeal.Infrastructure.Persistence.Configurations;
 
-public class ChatFeedbackConfiguration : IEntityTypeConfiguration<ChatFeedback>
+public sealed class ConfigurationChatFeedback : IEntityTypeConfiguration<ChatFeedback>
 {
     public void Configure(EntityTypeBuilder<ChatFeedback> builder)
     {

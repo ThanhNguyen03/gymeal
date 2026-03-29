@@ -11,7 +11,7 @@ namespace Gymeal.Presentation.Controllers;
 [ApiController]
 [Route("api/v1/users")]
 [Authorize]
-public class UsersController(ISender mediator) : ControllerBase
+public sealed class UsersController(ISender mediator) : ControllerBase
 {
     /// <summary>Get the current authenticated user's profile.</summary>
     [HttpGet("me")]

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Gymeal.Infrastructure.Persistence.Configurations;
 
-public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
+public sealed class ConfigurationUserProfile : IEntityTypeConfiguration<UserProfile>
 {
     public void Configure(EntityTypeBuilder<UserProfile> builder)
     {

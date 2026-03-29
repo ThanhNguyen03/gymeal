@@ -10,7 +10,7 @@ namespace Gymeal.Application.Common.Behaviours;
 /// for a request before the handler executes. Returns a validation error Result
 /// without reaching the handler if validation fails.
 /// </summary>
-public class ValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
+public sealed class ValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
     where TResponse : class

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Gymeal.Infrastructure.Persistence.Configurations;
 
-public class UserBehaviorEventConfiguration : IEntityTypeConfiguration<UserBehaviorEvent>
+public sealed class ConfigurationUserBehaviorEvent : IEntityTypeConfiguration<UserBehaviorEvent>
 {
     public void Configure(EntityTypeBuilder<UserBehaviorEvent> builder)
     {

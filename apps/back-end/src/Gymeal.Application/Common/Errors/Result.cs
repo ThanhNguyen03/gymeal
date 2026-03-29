@@ -4,7 +4,7 @@ namespace Gymeal.Application.Common.Errors;
 /// Discriminated union: either a success value or a typed error.
 /// Handlers return Result&lt;T&gt;; controllers map errors to HTTP status codes.
 /// </summary>
-public class Result<TValue>
+public sealed class Result<TValue>
 {
     private readonly TValue? _value;
     private readonly Error? _error;

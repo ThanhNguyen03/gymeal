@@ -10,11 +10,11 @@ namespace Gymeal.Infrastructure.Services;
 /// DECISION: internal auth header over JWT because ai-service is not public.
 /// Trade-off: must ensure network isolation (Koyeb internal routing in prod).
 /// </summary>
-public sealed class AiServiceHttpClient
+public sealed class ServiceAiHttpClient
 {
     private readonly HttpClient _httpClient;
 
-    public AiServiceHttpClient(HttpClient httpClient, IConfiguration configuration)
+    public ServiceAiHttpClient(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
 
