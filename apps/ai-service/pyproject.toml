@@ -33,13 +33,14 @@ httpx = "0.28.1"
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+exclude = ["tests/", "scripts/"]
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "ANN", "S", "B"]
 ignore = [
-  "ANN101",  # Missing type annotation for `self`
-  "ANN102",  # Missing type annotation for `cls`
   "S101",    # Allow assert in tests
+  "ANN401",  # Allow Any in some cases (FastAPI internals)
 ]
-exclude = ["tests/", "scripts/"]
 
 [tool.ruff.format]
 quote-style = "double"
