@@ -4,6 +4,9 @@ using AspNetCoreRateLimit;
 using Gymeal.Application;
 using Gymeal.Domain.Interfaces.Services;
 using Gymeal.Infrastructure;
+using Gymeal.Infrastructure.GraphQL.DataLoaders;
+using Gymeal.Infrastructure.GraphQL.Queries;
+using Gymeal.Infrastructure.GraphQL.Types;
 using Gymeal.Presentation.Middlewares;
 using Gymeal.Presentation.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -172,17 +175,26 @@ builder.Services.AddSingleton<AspNetCoreRateLimit.IRateLimitConfiguration,
     AspNetCoreRateLimit.RateLimitConfiguration>();
 builder.Services.AddInMemoryRateLimiting();
 
-// ── Hot Chocolate GraphQL stub ────────────────────────────────────────────────
-// NOTE: Hot Chocolate chosen over Apollo Server (JS) because:
+// ── Hot Chocolate GraphQL ─────────────────────────────────────────────────────
+// DECISION: Hot Chocolate chosen over Apollo Server (JS) because:
 // 1. Native .NET — no Node.js runtime, no separate service
 // 2. Shares ASP.NET Core DI, auth, and middleware pipeline
-// 3. Built-in WebSocket subscriptions (graphql-transport-ws)
-// 4. DataLoader built-in for N+1 prevention
+// 3. Built-in DataLoader for N+1 prevention
+// 4. Built-in WebSocket subscriptions (graphql-transport-ws)
 // Trade-off: Smaller ecosystem than Apollo; schema federation not needed for this project scope.
+// Reference: PLAN.md §6
 builder.Services
     .AddGraphQLServer()
-    .AddQueryType(d => d.Name("Query").Field("_placeholder").Type<HotChocolate.Types.StringType>().Resolve(_ => new ValueTask<object?>("ok")))
-    .AddMutationType(d => d.Name("Mutation").Field("_placeholder").Type<HotChocolate.Types.StringType>().Resolve(_ => new ValueTask<object?>("ok")));
+    .AddQueryType(d => d.Name("Query"))
+    .AddTypeExtension<QueryMeals>()
+    .AddTypeExtension<QueryProviders>()
+    .AddType<TypeMeal>()
+    .AddType<TypeProvider>()
+    .AddDataLoader<DataLoaderProviderById>()
+    .AddDataLoader<DataLoaderMealsByProviderId>()
+    .AddFiltering()
+    .AddSorting()
+    .AddAuthorization();
 
 WebApplication app = builder.Build();
 
