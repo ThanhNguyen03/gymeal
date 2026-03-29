@@ -29,7 +29,7 @@ CQRS handlers, validators, pipeline behaviours. Depends on Domain only.
 
 - `Common/Errors/` — `Error`, `Result<T>`
 - `Common/Interfaces/` — `IAppDbContext` (thin interface for EF Core ChangeTracker access)
-- `Common/Behaviours/` — `LoggingBehaviour`, `ValidationBehaviour`, `AuditBehaviour`
+- `Common/Behaviours/` — `LoggingBehaviour`, `ValidationBehaviour`, `AuditBehaviour` *(all sealed)*
 - `Features/Auth/Commands/` — `RegisterUser`, `LoginUser`, `RefreshToken`, `LogoutUser`
 - `Features/Users/` — `GetCurrentUser`, `UpdateUserProfile`
 
@@ -39,15 +39,21 @@ CQRS handlers, validators, pipeline behaviours. Depends on Domain only.
 EF Core, Redis, BCrypt implementations. Never referenced directly by Presentation.
 
 - `Persistence/AppDbContext.cs` — soft-delete query filters, CreatedAt/UpdatedAt auto-set, audit log writing in SaveChangesAsync
-- `Persistence/Configurations/` — one `IEntityTypeConfiguration<T>` per entity
-- `Persistence/Repositories/` — `UserRepository`
-- `Services/` — `RedisTokenService`, `BcryptPasswordHasher`, `DateTimeProvider`
+- `Persistence/Configurations/` — one `IEntityTypeConfiguration<T>` per entity, named `Configuration{Entity}` (e.g. `ConfigurationUser`, `ConfigurationAuditLog`)
+- `Persistence/Repositories/` — `RepositoryUser`
+- `Services/` — `ServiceRedisToken`, `ServiceBcryptPasswordHasher`, `ServiceDateTimeProvider`, `ServiceAiHttpClient`
+
+> **Naming convention:** Services, repositories, middlewares, and EF configurations use the Microsoft-Style
+> Prefix convention (`Service{Name}`, `Repository{Name}`, `Middleware{Name}`, `Configuration{Entity}`).
+> Controllers keep the `*Controller` suffix (ASP.NET auto-discovery) and interfaces keep `I` prefix
+> (Microsoft C# guideline). All concrete classes are `sealed` by default.
 
 ### `Gymeal.Presentation`
 ASP.NET Core host. Wires everything together, never contains business logic.
 
-- `Controllers/` — `AuthController` (`/api/v1/auth`), `UsersController` (`/api/v1/users`)
-- `Services/CurrentUserService.cs` — reads claims from `HttpContext`
+- `Controllers/` — `AuthController` (`/api/v1/auth`), `UsersController` (`/api/v1/users`) *(keep `*Controller` suffix — ASP.NET convention)*
+- `Services/ServiceCurrentUser.cs` — reads claims from `HttpContext`
+- `Middlewares/` — `MiddlewareException`, `MiddlewareCorrelationId`
 - `Program.cs` — bootstraps Serilog, JWT RS256, rate limiting, middleware pipeline
 
 ## Key architectural decisions
