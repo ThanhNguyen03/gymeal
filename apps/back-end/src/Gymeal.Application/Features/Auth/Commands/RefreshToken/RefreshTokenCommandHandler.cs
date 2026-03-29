@@ -1,4 +1,4 @@
-using Gymeal.Application.Common.Errors;
+using Gymeal.Domain.Common;
 using Gymeal.Application.Features.Auth.DTOs;
 using Gymeal.Domain.Entities;
 using Gymeal.Domain.Interfaces.Repositories;
@@ -22,11 +22,13 @@ public sealed class RefreshTokenCommandHandler(
             return Error.Unauthorized("Refresh token is invalid or expired.");
         }
 
-        User? user = await userRepository.GetByIdAsync(userId.Value, cancellationToken);
-        if (user is null)
+        Result<User> userResult = await userRepository.GetByIdAsync(userId.Value, cancellationToken);
+        if (userResult.IsFailure)
         {
             return Error.Unauthorized("User not found.");
         }
+
+        User user = userResult.Value;
 
         // Rotate refresh token — revoke old, issue new
         await tokenService.RevokeRefreshTokenAsync(request.Token, cancellationToken);

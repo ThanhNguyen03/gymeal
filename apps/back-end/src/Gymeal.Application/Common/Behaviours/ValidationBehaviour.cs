@@ -1,6 +1,6 @@
 using FluentValidation;
 using FluentValidation.Results;
-using Gymeal.Application.Common.Errors;
+using Gymeal.Domain.Common;
 using MediatR;
 
 namespace Gymeal.Application.Common.Behaviours;

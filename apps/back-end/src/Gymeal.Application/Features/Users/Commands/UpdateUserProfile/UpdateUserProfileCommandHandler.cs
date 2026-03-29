@@ -1,4 +1,4 @@
-using Gymeal.Application.Common.Errors;
+using Gymeal.Domain.Common;
 using Gymeal.Application.Features.Users.DTOs;
 using Gymeal.Domain.Entities;
 using Gymeal.Domain.Interfaces.Repositories;
@@ -21,11 +21,13 @@ public sealed class UpdateUserProfileCommandHandler(
             return Error.Unauthorized();
         }
 
-        User? user = await userRepository.GetByIdAsync(currentUser.UserId.Value, cancellationToken);
-        if (user is null)
+        Result<User> userResult = await userRepository.GetByIdAsync(currentUser.UserId.Value, cancellationToken);
+        if (userResult.IsFailure)
         {
-            return Error.NotFound("User", currentUser.UserId.Value);
+            return userResult.Error;
         }
+
+        User user = userResult.Value;
 
         // Ensure profile exists (created at registration with minimal data)
         user.Profile ??= new UserProfile { UserId = user.Id };
@@ -46,7 +48,11 @@ public sealed class UpdateUserProfileCommandHandler(
 
         profile.UpdatedAt = dateTime.UtcNow;
 
-        await userRepository.UpdateAsync(user, cancellationToken);
+        Result<User> updateResult = await userRepository.UpdateAsync(user, cancellationToken);
+        if (updateResult.IsFailure)
+        {
+            return updateResult.Error;
+        }
 
         return new UserProfileDto(
             UserId: user.Id,
