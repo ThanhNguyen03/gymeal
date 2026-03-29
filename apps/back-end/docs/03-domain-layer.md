@@ -105,19 +105,90 @@ Immutable record of every change to auditable entities.
 
 PasswordHash is explicitly excluded from Changes to prevent credential leakage in audit logs.
 
+### Provider
+Business entity that sells meals. Owned by a `User` with `Provider` role.
+
+| Property | Type | Notes |
+|----------|------|-------|
+| UserId | Guid | FK → users, unique |
+| Name | string | Display name |
+| Description | string | |
+| LogoUrl | string? | |
+| CuisineTags | List\<string\> | Stored as `text[]`, GIN index |
+| IsVerified | bool | Set by Admin via VerifyProviderCommand |
+| Rating | decimal | Computed; updated on order completion |
+| TotalOrders | int | Denormalized counter |
+| DeletedAt | DateTime? | ISoftDeletable |
+
+### Meal
+Core catalog entity. Nutritional data + vector embedding for AI similarity search.
+
+| Property | Type | Notes |
+|----------|------|-------|
+| ProviderId | Guid | FK → providers |
+| Name | string | Max 200 chars; GIN trigram index |
+| Description | string | GIN trigram index |
+| ImageUrl | string? | Cloudinary URL |
+| Category | EMealCategory | |
+| PriceInCents | int | **Integer cents** — avoids float precision bugs |
+| Calories | int | |
+| ProteinG / CarbsG / FatG / FiberG | decimal | |
+| Ingredients / AllergenTags / FitnessGoalTags | List\<string\> | `text[]` columns |
+| IsAvailable | bool | Partial index `WHERE is_available = true` |
+| Embedding | float[]? | `vector(768)` — **never exposed in API** |
+| DeletedAt | DateTime? | ISoftDeletable |
+
+### MealRequest
+Custom order request from customer to provider. Immutable record (no soft delete — status field tracks lifecycle).
+
+| Property | Type | Notes |
+|----------|------|-------|
+| UserId | Guid | FK → users |
+| ProviderId | Guid | FK → providers |
+| Description | string | Customer's request details |
+| Status | EMealRequestStatus | Pending → Accepted/Rejected → Completed |
+| ResponseMessage | string? | Provider's reply |
+| QuotePriceInCents | int? | Provider's quoted price |
+
 ## Enums
 
 | Enum | Values |
 |------|--------|
-| UserRole | Customer, Provider, Admin |
-| FitnessGoalType | Cut, Bulk, Maintain, Endurance, Recomp |
-| ActivityLevel | Sedentary, LightlyActive, ModeratelyActive, VeryActive, ExtremelyActive |
-| AuditAction | Create, Update, Delete |
-| MealTime | Breakfast, Lunch, Dinner, Snack, PreWorkout, PostWorkout |
-| OrderStatus | Pending, Confirmed, Preparing, Ready, Delivered, Cancelled |
-| NutritionDocumentCategory | Macronutrient, Micronutrient, SportNutrition, DietaryGuideline, GoalSpecific |
-| BehaviorEventType | MealViewed, MealOrdered, MealSearched, MealDismissed, ChatAsked, RecommendationClicked |
-| FeedbackSentiment | ThumbsUp, ThumbsDown |
+| EUserRole | Customer, Provider, Admin |
+| EFitnessGoalType | Cut, Bulk, Maintain, Endurance, Recomp |
+| EActivityLevel | Sedentary, LightlyActive, ModeratelyActive, VeryActive, ExtremelyActive |
+| EAuditAction | Create, Update, Delete |
+| EMealCategory | Breakfast, Lunch, Dinner, Snack, PreWorkout, PostWorkout |
+| EMealRequestStatus | Pending, Accepted, Rejected, Completed |
+| EMealTime | Breakfast, Lunch, Dinner, Snack, PreWorkout, PostWorkout |
+| EOrderStatus | Pending, Confirmed, Preparing, Ready, Delivered, Cancelled |
+| ENutritionDocumentCategory | Macronutrient, Micronutrient, SportNutrition, DietaryGuideline, GoalSpecific |
+| EBehaviorEventType | MealViewed, MealOrdered, MealSearched, MealDismissed, ChatAsked, RecommendationClicked |
+| EFeedbackSentiment | ThumbsUp, ThumbsDown |
+
+## Repository Interfaces
+
+All methods return `Result<T>` (RULE.md §5.6). Located in `Gymeal.Domain/Interfaces/Repositories/`.
+
+| Interface | Key Methods |
+|-----------|-------------|
+| `IUserRepository` | `GetByIdAsync`, `GetByEmailAsync`, `ExistsAsync`, `AddAsync`, `UpdateAsync` |
+| `IMealRepository` | `GetByIdAsync`, `GetPagedAsync`, `SearchAsync`, `GetSimilarAsync`, `AddAsync`, `UpdateAsync`, `CountAsync` |
+| `IProviderRepository` | `GetByIdAsync`, `GetByUserIdAsync`, `GetVerifiedPagedAsync`, `AddAsync`, `UpdateAsync`, `VerifyAsync`, `CountVerifiedAsync` |
+
+## Service Interfaces
+
+Located in `Gymeal.Domain/Interfaces/Services/`.
+
+| Interface | Purpose |
+|-----------|---------|
+| `ISearchService` | pg_trgm full-text search — `SearchMealsAsync(query, limit)` |
+| `ICacheService` | Redis abstraction — `GetAsync<T>`, `SetAsync<T>`, `RemoveAsync`, `RemoveByPrefixAsync` |
+| `IStorageService` | Cloudinary signed upload URLs — `GetSignedUploadUrlAsync(folder, fileName)` |
+| `ICurrentUserService` | Extracts `UserId` and `Role` from JWT claims |
+| `IDateTimeProvider` | Testable `UtcNow` abstraction |
+| `IPasswordHasher` | BCrypt hash/verify abstraction |
+| `ITokenService` | JWT generation, refresh token store/revoke/validate |
 
 ## AI Tables (owned by EF Core, shared with Python ai-service)
 
