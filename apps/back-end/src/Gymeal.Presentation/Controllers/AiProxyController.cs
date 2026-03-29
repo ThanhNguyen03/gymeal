@@ -20,6 +20,8 @@ namespace Gymeal.Presentation.Controllers;
 public sealed class AiProxyController(AiServiceHttpClient aiClient) : ControllerBase
 {
     // NOTE: Sprint 0 — stub responses. Real proxy forwarding implemented in Sprint 3.
+    // aiClient will be used in Sprint 3 when real proxy forwarding is wired.
+    private readonly AiServiceHttpClient _aiClient = aiClient;
 
     /// <summary>POST /api/v1/ai/chat/sessions</summary>
     [HttpPost("chat/sessions")]
