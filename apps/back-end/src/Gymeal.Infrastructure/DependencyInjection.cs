@@ -1,4 +1,10 @@
+using Gymeal.Application.Common.Interfaces;
+using Gymeal.Domain.Interfaces.Repositories;
+using Gymeal.Domain.Interfaces.Services;
+using Gymeal.Infrastructure.Persistence;
+using Gymeal.Infrastructure.Persistence.Repositories;
 using Gymeal.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,12 +16,23 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // ── EF Core (PostgreSQL + pgvector) ───────────────────────────────────
+        // DECISION: EF Core owns ALL migrations including AI tables.
+        // Never add Alembic. One migration owner, one source of truth.
+        // Reference: PLAN.md §10 (Migration Ownership Rule)
+        string databaseUrl = configuration["DATABASE_URL"]
+            ?? throw new InvalidOperationException("DATABASE_URL is not configured.");
+
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(databaseUrl, npgsql =>
+                npgsql.EnableRetryOnFailure(maxRetryCount: 3)));
+
+        services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+
         // ── AI Service HttpClient (BFF typed client) ──────────────────────────
         services.AddHttpClient<AiServiceHttpClient>();
 
         // ── Redis ─────────────────────────────────────────────────────────────
-        // NOTE: StackExchange.Redis connection registered here.
-        // Used for caching meal search results and session data.
         string redisUrl = configuration["REDIS_URL"]
             ?? throw new InvalidOperationException("REDIS_URL is not configured.");
 
@@ -25,10 +42,13 @@ public static class DependencyInjection
             options.InstanceName = "gymeal:";
         });
 
-        // ── EF Core (PostgreSQL + pgvector) ───────────────────────────────────
-        // NOTE: AppDbContext and entity configurations added in Sprint 1.
-        // EF Core owns ALL migrations — including AI tables.
-        // Never add Alembic. One migration owner, one source of truth.
+        // ── Repositories ──────────────────────────────────────────────────────
+        services.AddScoped<IUserRepository, UserRepository>();
+
+        // ── Domain services ───────────────────────────────────────────────────
+        services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddScoped<ITokenService, RedisTokenService>();
 
         return services;
     }
