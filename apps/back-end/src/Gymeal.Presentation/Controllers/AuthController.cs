@@ -10,9 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gymeal.Presentation.Controllers;
 
-[ApiController]
 [Route("api/v1/auth")]
-public sealed class AuthController(ISender mediator) : ControllerBase
+public sealed class AuthController(ISender mediator) : ApiControllerBase
 {
     /// <summary>Register a new customer account.</summary>
     /// <response code="201">Registration successful — auth cookies set.</response>
@@ -137,24 +136,4 @@ public sealed class AuthController(ISender mediator) : ControllerBase
         Response.Cookies.Delete("refresh_token", new CookieOptions { Path = "/api/v1/auth/refresh" });
     }
 
-    private ObjectResult MapError(Error error)
-    {
-        (int status, string title) = error.Code switch
-        {
-            var c when c.EndsWith("NotFound", StringComparison.Ordinal) => (404, "Not Found"),
-            var c when c.EndsWith("Unauthorized", StringComparison.Ordinal) => (401, "Unauthorized"),
-            var c when c.EndsWith("Forbidden", StringComparison.Ordinal) => (403, "Forbidden"),
-            var c when c.EndsWith("Conflict", StringComparison.Ordinal) => (409, "Conflict"),
-            var c when c.EndsWith("Failed", StringComparison.Ordinal) => (422, "Unprocessable Entity"),
-            _ => (500, "Internal Server Error"),
-        };
-
-        return StatusCode(status, new ProblemDetails
-        {
-            Status = status,
-            Title = title,
-            Detail = error.Message,
-            Extensions = { ["correlationId"] = HttpContext.Items["CorrelationId"] },
-        });
-    }
 }

@@ -1,4 +1,3 @@
-using Gymeal.Domain.Common;
 using Gymeal.Application.Features.Users.Commands.UpdateUserProfile;
 using Gymeal.Application.Features.Users.DTOs;
 using Gymeal.Application.Features.Users.Queries.GetCurrentUser;
@@ -8,10 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gymeal.Presentation.Controllers;
 
-[ApiController]
 [Route("api/v1/users")]
 [Authorize]
-public sealed class UsersController(ISender mediator) : ControllerBase
+public sealed class UsersController(ISender mediator) : ApiControllerBase
 {
     /// <summary>Get the current authenticated user's profile.</summary>
     [HttpGet("me")]
@@ -41,23 +39,4 @@ public sealed class UsersController(ISender mediator) : ControllerBase
             : MapError(result.Error);
     }
 
-    private ObjectResult MapError(Error error)
-    {
-        (int status, string title) = error.Code switch
-        {
-            var c when c.EndsWith("NotFound", StringComparison.Ordinal) => (404, "Not Found"),
-            var c when c.EndsWith("Unauthorized", StringComparison.Ordinal) => (401, "Unauthorized"),
-            var c when c.EndsWith("Forbidden", StringComparison.Ordinal) => (403, "Forbidden"),
-            var c when c.EndsWith("Failed", StringComparison.Ordinal) => (422, "Unprocessable Entity"),
-            _ => (500, "Internal Server Error"),
-        };
-
-        return StatusCode(status, new ProblemDetails
-        {
-            Status = status,
-            Title = title,
-            Detail = error.Message,
-            Extensions = { ["correlationId"] = HttpContext.Items["CorrelationId"] },
-        });
-    }
 }
