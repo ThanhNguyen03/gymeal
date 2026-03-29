@@ -1,10 +1,35 @@
+using System.Security.Cryptography;
 using System.Text.Json;
+using AspNetCoreRateLimit;
 using Gymeal.Application;
+using Gymeal.Domain.Interfaces.Services;
 using Gymeal.Infrastructure;
 using Gymeal.Presentation.Middlewares;
+using Gymeal.Presentation.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Serilog.Formatting.Json;
+
+// ── Serilog (configure before anything else to capture startup errors) ────────
+// DECISION: Serilog chosen over default Microsoft.Extensions.Logging for:
+// 1. Structured JSON output (compatible with Logtail, Seq, Grafana Loki)
+// 2. LogContext.PushProperty — correlation ID propagation in CorrelationIdMiddleware
+// 3. Enrichers for machine name, thread ID, request path
+// Reference: PLAN.md §13 (Logging & Observability)
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console(new JsonFormatter())
+    .CreateBootstrapLogger();
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, loggerConfig) =>
+    loggerConfig
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .WriteTo.Console(new JsonFormatter()));
 
 // ── Sentry ────────────────────────────────────────────────────────────────────
 builder.WebHost.UseSentry(options =>
@@ -34,6 +59,55 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
+// ── HttpContextAccessor (needed by CurrentUserService) ────────────────────────
+builder.Services.AddHttpContextAccessor();
+
+// ── CurrentUserService (Scoped — one per request) ─────────────────────────────
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+// ── JWT RS256 Authentication ──────────────────────────────────────────────────
+// SECURITY: RS256 asymmetric — private key on back-end, public key shared with edge.
+// Token is read from HttpOnly cookie, not Authorization header.
+// Reference: PLAN.md §7 (Application Security)
+string publicKeyBase64 = builder.Configuration["JWT_PUBLIC_KEY_BASE64"]
+    ?? throw new InvalidOperationException("JWT_PUBLIC_KEY_BASE64 is not configured.");
+
+byte[] publicKeyBytes = Convert.FromBase64String(publicKeyBase64);
+RSA rsaPublic = RSA.Create();
+rsaPublic.ImportSubjectPublicKeyInfo(publicKeyBytes, out _);
+RsaSecurityKey rsaSecurityKey = new(rsaPublic);
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JWT_ISSUER"],
+            ValidAudience = builder.Configuration["JWT_AUDIENCE"],
+            IssuerSigningKey = rsaSecurityKey,
+            // NOTE: ClockSkew = Zero prevents the default 5-minute grace period.
+            // With 15-minute access tokens, a 5-minute grace is 33% of lifetime — too long.
+            ClockSkew = TimeSpan.Zero,
+        };
+
+        // Read JWT from HttpOnly cookie instead of Authorization header
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                context.Token = context.Request.Cookies["access_token"];
+                return Task.CompletedTask;
+            },
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 // ── Controllers ───────────────────────────────────────────────────────────────
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -55,7 +129,7 @@ builder.Services.AddSwaggerGen(options =>
         Name = "Authorization",
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
         Scheme = "bearer",
-        BearerFormat = "JWT"
+        BearerFormat = "JWT",
     });
     options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
@@ -65,11 +139,11 @@ builder.Services.AddSwaggerGen(options =>
                 Reference = new Microsoft.OpenApi.Models.OpenApiReference
                 {
                     Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                    Id = "Bearer",
+                },
             },
             Array.Empty<string>()
-        }
+        },
     });
 });
 
@@ -92,20 +166,28 @@ builder.Services.AddHealthChecks()
 
 // ── Rate limiting ─────────────────────────────────────────────────────────────
 builder.Services.AddMemoryCache();
-builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
-builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.Configure<AspNetCoreRateLimit.IpRateLimitOptions>(
+    builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.AddSingleton<AspNetCoreRateLimit.IRateLimitConfiguration,
+    AspNetCoreRateLimit.RateLimitConfiguration>();
 builder.Services.AddInMemoryRateLimiting();
 
 // ── Hot Chocolate GraphQL stub ────────────────────────────────────────────────
+// NOTE: Hot Chocolate chosen over Apollo Server (JS) because:
+// 1. Native .NET — no Node.js runtime, no separate service
+// 2. Shares ASP.NET Core DI, auth, and middleware pipeline
+// 3. Built-in WebSocket subscriptions (graphql-transport-ws)
+// 4. DataLoader built-in for N+1 prevention
+// Trade-off: Smaller ecosystem than Apollo; schema federation not needed for this project scope.
 builder.Services
     .AddGraphQLServer()
-    .AddQueryType(d => d.Name("Query").Field("_placeholder").Type<StringType>().Resolve("ok"))
-    .AddMutationType(d => d.Name("Mutation").Field("_placeholder").Type<StringType>().Resolve("ok"));
+    .AddQueryType(d => d.Name("Query").Field("_placeholder").Type<HotChocolate.Types.StringType>().Resolve(_ => new ValueTask<object?>("ok")))
+    .AddMutationType(d => d.Name("Mutation").Field("_placeholder").Type<HotChocolate.Types.StringType>().Resolve(_ => new ValueTask<object?>("ok")));
 
 WebApplication app = builder.Build();
 
 // ── Middleware pipeline ────────────────────────────────────────────────────────
-// NOTE: order matters — CorrelationId must be first to propagate to all logs/errors
+// NOTE: Order matters — CorrelationId must be first to propagate to all logs/errors.
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -124,16 +206,14 @@ app.UseAuthorization();
 // ── Health endpoints ──────────────────────────────────────────────────────────
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
-    // Liveness: always returns 200 if app is running
     Predicate = _ => false,
-    ResponseWriter = WriteHealthResponse
+    ResponseWriter = WriteHealthResponse,
 });
 
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
-    // Readiness: check all tagged "ready" dependencies
     Predicate = check => check.Tags.Contains("ready"),
-    ResponseWriter = WriteHealthResponse
+    ResponseWriter = WriteHealthResponse,
 });
 
 // ── GraphQL ───────────────────────────────────────────────────────────────────
@@ -145,7 +225,9 @@ app.MapControllers();
 app.Run();
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-static Task WriteHealthResponse(HttpContext context, Microsoft.Extensions.Diagnostics.HealthChecks.HealthReport report)
+static Task WriteHealthResponse(
+    HttpContext context,
+    Microsoft.Extensions.Diagnostics.HealthChecks.HealthReport report)
 {
     context.Response.ContentType = "application/json";
     JsonSerializerOptions options = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
@@ -155,8 +237,12 @@ static Task WriteHealthResponse(HttpContext context, Microsoft.Extensions.Diagno
         duration = report.TotalDuration.TotalMilliseconds,
         entries = report.Entries.ToDictionary(
             e => e.Key,
-            e => new { status = e.Value.Status.ToString(), e.Value.Description, duration = e.Value.Duration.TotalMilliseconds }
-        )
+            e => new
+            {
+                status = e.Value.Status.ToString(),
+                e.Value.Description,
+                duration = e.Value.Duration.TotalMilliseconds,
+            }),
     }, options);
     return context.Response.WriteAsync(json);
 }
