@@ -23,6 +23,9 @@ public sealed class ServiceCurrentUser(IHttpContextAccessor httpContextAccessor)
         }
     }
 
+    public string? Role =>
+        httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Role);
+
     public string? IpAddress =>
         httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
 }
