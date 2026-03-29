@@ -3620,7 +3620,7 @@ __metadata:
     eslint: "npm:^9"
     eslint-config-next: "npm:15.2.4"
     eslint-config-prettier: "npm:10.1.1"
-    graphql: "npm:16.10.0"
+    graphql: "npm:16.13.2"
     next: "npm:15.2.4"
     prettier: "npm:3.5.3"
     react: "npm:^19.0.0"
@@ -3842,10 +3842,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql@npm:16.10.0":
-  version: 16.10.0
-  resolution: "graphql@npm:16.10.0"
-  checksum: 10c0/303730675538c8bd6c76b447dc6f03e61242e2d2596b408c34759666ec4877409e5593a7a0467d590ac5407b8c663b093b599556a77f24f281abea69ddc53de6
+"graphql@npm:16.13.2":
+  version: 16.13.2
+  resolution: "graphql@npm:16.13.2"
+  checksum: 10c0/64e822a0a0e4398781e4bc9765b88d370c08261498b517add4b878038ef7be2005b6b394a79a5102b9379d57052f60bc7f23fec8f39808d101984a74772ebd9d
   languageName: node
   linkType: hard
 
