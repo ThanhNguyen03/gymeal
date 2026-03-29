@@ -1,4 +1,4 @@
-using Gymeal.Application.Common.Errors;
+using Gymeal.Domain.Common;
 using Gymeal.Application.Features.Users.DTOs;
 using Gymeal.Domain.Entities;
 using Gymeal.Domain.Interfaces.Repositories;
@@ -20,12 +20,13 @@ public sealed class GetCurrentUserQueryHandler(
             return Error.Unauthorized();
         }
 
-        User? user = await userRepository.GetByIdAsync(currentUser.UserId.Value, cancellationToken);
-        if (user is null)
+        Result<User> userResult = await userRepository.GetByIdAsync(currentUser.UserId.Value, cancellationToken);
+        if (userResult.IsFailure)
         {
-            return Error.NotFound("User", currentUser.UserId.Value);
+            return userResult.Error;
         }
 
+        User user = userResult.Value;
         UserProfile profile = user.Profile ?? new UserProfile { UserId = user.Id };
 
         return new UserProfileDto(

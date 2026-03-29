@@ -1,4 +1,4 @@
-using Gymeal.Application.Common.Errors;
+using Gymeal.Domain.Common;
 using Gymeal.Application.Features.Auth.Commands.LoginUser;
 using Gymeal.Application.Features.Auth.Commands.LogoutUser;
 using Gymeal.Application.Features.Auth.Commands.RefreshToken;

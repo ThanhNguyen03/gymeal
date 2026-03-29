@@ -1,4 +1,4 @@
-using Gymeal.Application.Common.Errors;
+using Gymeal.Domain.Common;
 using Gymeal.Domain.Interfaces.Services;
 using MediatR;
 

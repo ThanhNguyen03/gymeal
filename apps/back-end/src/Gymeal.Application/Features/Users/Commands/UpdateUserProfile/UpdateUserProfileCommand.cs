@@ -1,5 +1,5 @@
 using Gymeal.Application.Common.Behaviours;
-using Gymeal.Application.Common.Errors;
+using Gymeal.Domain.Common;
 using Gymeal.Application.Features.Users.DTOs;
 using Gymeal.Domain.Enums;
 using MediatR;

@@ -1,4 +1,4 @@
-using Gymeal.Application.Common.Errors;
+using Gymeal.Domain.Common;
 using Gymeal.Application.Features.Auth.DTOs;
 using Gymeal.Domain.Entities;
 using Gymeal.Domain.Interfaces.Repositories;
@@ -40,7 +40,11 @@ public sealed class RegisterUserCommandHandler(
 
         user.Profile = profile;
 
-        await userRepository.AddAsync(user, cancellationToken);
+        Result<User> addResult = await userRepository.AddAsync(user, cancellationToken);
+        if (addResult.IsFailure)
+        {
+            return addResult.Error;
+        }
 
         string accessToken = tokenService.GenerateAccessToken(user);
         string refreshToken = tokenService.GenerateRefreshToken();

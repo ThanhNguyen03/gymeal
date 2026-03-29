@@ -1,4 +1,4 @@
-using Gymeal.Application.Common.Errors;
+using Gymeal.Domain.Common;
 using Gymeal.Application.Features.Users.Commands.UpdateUserProfile;
 using Gymeal.Application.Features.Users.DTOs;
 using Gymeal.Application.Features.Users.Queries.GetCurrentUser;

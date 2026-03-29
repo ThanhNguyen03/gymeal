@@ -1,4 +1,4 @@
-using Gymeal.Application.Common.Errors;
+using Gymeal.Domain.Common;
 using Gymeal.Application.Features.Auth.DTOs;
 using Gymeal.Domain.Entities;
 using Gymeal.Domain.Interfaces.Repositories;
@@ -17,14 +17,17 @@ public sealed class LoginUserCommandHandler(
         LoginUserCommand request,
         CancellationToken cancellationToken)
     {
-        User? user = await userRepository.GetByEmailAsync(request.Email.ToLowerInvariant(), cancellationToken);
+        Result<User> userResult = await userRepository.GetByEmailAsync(request.Email.ToLowerInvariant(), cancellationToken);
 
         // NOTE: We return the same error for "not found" and "wrong password" to prevent
         // user enumeration attacks — an attacker shouldn't be able to tell which one failed.
-        if (user is null || !passwordHasher.Verify(request.Password, user.PasswordHash))
+        // SECURITY: Constant-time-ish response regardless of whether user exists.
+        if (userResult.IsFailure || !passwordHasher.Verify(request.Password, userResult.Value.PasswordHash))
         {
             return Error.Unauthorized("Invalid email or password.");
         }
+
+        User user = userResult.Value;
 
         string accessToken = tokenService.GenerateAccessToken(user);
         string refreshToken = tokenService.GenerateRefreshToken();

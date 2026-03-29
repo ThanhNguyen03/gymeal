@@ -1,5 +1,38 @@
 # Domain Layer
 
+## Domain.Common — Error & Result\<T\>
+
+`Gymeal.Domain.Common` houses the two foundational value types used everywhere:
+
+### Error
+
+```csharp
+public record Error(string Code, string Message)
+```
+
+Static factory methods: `NotFound`, `Validation`, `Unauthorized`, `Conflict`, `Forbidden`.
+`Error.None` represents the absence of an error (used internally by `Result<T>`).
+
+### Result\<T\>
+
+```csharp
+public sealed class Result<TValue>
+```
+
+All repository interface methods return `Result<T>` (RULE.md §5.6). Callers pattern-match:
+
+```csharp
+Result<User> result = await userRepository.GetByIdAsync(id, ct);
+if (result.IsFailure) return result.Error;   // propagate
+User user = result.Value;                    // safe — only after IsSuccess check
+```
+
+**Why Domain, not Application?** `IRepository` interfaces live in Domain. If `Result<T>` lived in Application, Domain would have to reference Application — a Clean Architecture violation. Placing `Result<T>` in Domain keeps the dependency arrow pointing inward.
+
+**Backwards compatibility:** `Gymeal.Application/Common/Errors/Error.cs` contains `global using Error = Gymeal.Domain.Common.Error;` so legacy Application code continues to compile without modification.
+
+---
+
 ## BaseEntity
 
 All persistent entities (except `UserProfile`, which uses `UserId` as its PK) extend `BaseEntity`:
