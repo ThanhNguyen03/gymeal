@@ -1,46 +1,51 @@
 version: 2
 updates:
   # Front-end (Next.js)
+  # open-pull-requests-limit: 0 — alerts only, no auto PRs
   - package-ecosystem: "npm"
     directory: "/apps/front-end"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     labels: ["dependencies", "front-end"]
 
   # Root workspace (Turbo + shared dev deps)
+  # open-pull-requests-limit: 0 — alerts only, no auto PRs
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 0
     labels: ["dependencies", "tooling"]
 
   # Python ai-service (Poetry)
+  # open-pull-requests-limit: 0 — alerts only, no auto PRs
   - package-ecosystem: "pip"
     directory: "/apps/ai-service"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     labels: ["dependencies", "ai-service"]
 
   # C# back-end (NuGet)
+  # open-pull-requests-limit: 0 — alerts only, no auto PRs
   - package-ecosystem: "nuget"
     directory: "/apps/back-end"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     labels: ["dependencies", "back-end"]
 
   # GitHub Actions
+  # open-pull-requests-limit: 0 — alerts only, no auto PRs
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 0
     labels: ["dependencies", "ci"]
