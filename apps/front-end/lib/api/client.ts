@@ -7,7 +7,7 @@
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 
-type RequestOptions = RequestInit & {
+type TRequestOptions = RequestInit & {
   params?: Record<string, string | number | boolean | undefined>;
 };
 
@@ -27,7 +27,7 @@ function generateCorrelationId(): string {
   return crypto.randomUUID();
 }
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function request<T>(path: string, options: TRequestOptions = {}): Promise<T> {
   const { params, headers, ...rest } = options;
   const url = buildUrl(path, params);
 
@@ -65,30 +65,30 @@ export class ApiError extends Error {
 }
 
 export const apiClient = {
-  get: <T>(path: string, options?: RequestOptions) =>
+  get: <T>(path: string, options?: TRequestOptions) =>
     request<T>(path, { method: "GET", ...options }),
 
-  post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+  post: <T>(path: string, body?: unknown, options?: TRequestOptions) =>
     request<T>(path, {
       method: "POST",
       body: body !== undefined ? JSON.stringify(body) : undefined,
       ...options,
     }),
 
-  put: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+  put: <T>(path: string, body?: unknown, options?: TRequestOptions) =>
     request<T>(path, {
       method: "PUT",
       body: body !== undefined ? JSON.stringify(body) : undefined,
       ...options,
     }),
 
-  patch: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+  patch: <T>(path: string, body?: unknown, options?: TRequestOptions) =>
     request<T>(path, {
       method: "PATCH",
       body: body !== undefined ? JSON.stringify(body) : undefined,
       ...options,
     }),
 
-  delete: <T>(path: string, options?: RequestOptions) =>
+  delete: <T>(path: string, options?: TRequestOptions) =>
     request<T>(path, { method: "DELETE", ...options }),
 };
