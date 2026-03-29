@@ -7,6 +7,7 @@ using Gymeal.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Gymeal.Infrastructure;
 
@@ -42,13 +43,22 @@ public static class DependencyInjection
             options.InstanceName = "gymeal:";
         });
 
+        // IConnectionMultiplexer is required by ServiceRedisCache for prefix-based key deletion
+        services.AddSingleton<IConnectionMultiplexer>(_ =>
+            ConnectionMultiplexer.Connect(redisUrl));
+
         // ── Repositories ──────────────────────────────────────────────────────
         services.AddScoped<IUserRepository, RepositoryUser>();
+        services.AddScoped<IMealRepository, RepositoryMeal>();
+        services.AddScoped<IProviderRepository, RepositoryProvider>();
 
         // ── Domain services ───────────────────────────────────────────────────
         services.AddSingleton<IPasswordHasher, ServiceBcryptPasswordHasher>();
         services.AddSingleton<IDateTimeProvider, ServiceDateTimeProvider>();
         services.AddScoped<ITokenService, ServiceRedisToken>();
+        services.AddScoped<ISearchService, ServiceTrgmSearch>();
+        services.AddScoped<ICacheService, ServiceRedisCache>();
+        services.AddScoped<IStorageService, ServiceCloudinaryStorage>();
 
         return services;
     }

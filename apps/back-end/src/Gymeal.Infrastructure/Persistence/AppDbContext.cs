@@ -31,6 +31,11 @@ public class AppDbContext(
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
+    // ── Sprint 2 tables ───────────────────────────────────────────────────────
+    public DbSet<Provider> Providers => Set<Provider>();
+    public DbSet<Meal> Meals => Set<Meal>();
+    public DbSet<MealRequest> MealRequests => Set<MealRequest>();
+
     // ── AI tables (schema owned here, read/write by Python ai-service) ────────
     public DbSet<NutritionDocument> NutritionDocuments => Set<NutritionDocument>();
     public DbSet<UserPreferenceEmbedding> UserPreferenceEmbeddings => Set<UserPreferenceEmbedding>();
